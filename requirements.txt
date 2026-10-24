@@ -1,0 +1,12 @@
+
+
+pymongo==4.7.1          # MongoDB Python driver
+motor==3.4.0            # Async MongoDB driver (opcionalno)
+minio==7.2.7            # MinIO / S3 Python SDK
+kafka-python==2.0.2     # Kafka consumer/producer
+requests==2.31.0        # HTTP zahtjevi (aves.regoch.net API)
+python-dotenv==1.0.1    # Čitanje .env datoteka
+thefuzz==0.22.1         # Fuzzy string matching (za filtriranje vrsta)
+python-Levenshtein==0.25.1  # Ubrzava thefuzz
+pandas==2.2.2           # Obrada CSV i transformacije podataka
+snakemake==8.14.0       # Orkestrator pipeline koraka

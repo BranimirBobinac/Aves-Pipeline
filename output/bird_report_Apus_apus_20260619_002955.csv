@@ -1,0 +1,2 @@
+scientific_name,common_name,family,order,classified_observations,avg_confidence,max_confidence,min_confidence,total_kafka_observations,lat,lon,first_classified,last_classified,unique_observers
+Apus apus,Common Swift,Apodidae,Apodiformes,1,0.587,0.587,0.587,0,45.815,15.9819,2026-06-19 00:25,2026-06-19 00:25,1

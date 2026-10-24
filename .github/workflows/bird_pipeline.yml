@@ -1,0 +1,128 @@
+
+
+name: Bird Observation Pipeline
+
+# workflow_dispatch = ručno okidanje (nije automatski na push)
+on:
+  workflow_dispatch:
+    inputs:
+      species_filter:
+        description: "Fuzzy filter po nazivu vrste (ostavite prazno za sve)"
+        required: false
+        default: ""
+        type: string
+      run_step:
+        description: "Koji korak pokrenuti (all = cijeli pipeline)"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - collect_species
+          - consume_kafka
+          - process_audio
+          - generate_report
+
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest  # Ubuntu VM na GitHub-u
+
+    services:
+      # MongoDB Docker kontejner
+      mongodb:
+        image: mongo:7.0
+        env:
+          MONGO_INITDB_ROOT_USERNAME: mongouser
+          MONGO_INITDB_ROOT_PASSWORD: mongopass123
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      # MinIO Docker kontejner
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin123
+        ports:
+          - 9000:9000
+          - 9001:9001
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      
+      - name: Checkout koda
+        uses: actions/checkout@v4
+
+      
+      - name: Postavi Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"  
+
+      
+      - name: Instaliraj ovisnosti
+        run: |
+          pip install -r requirements.txt
+
+      
+      - name: Kreiraj .env
+        run: |
+          cat > .env << EOF
+          MONGO_URI=mongodb://mongouser:mongopass123@localhost:27017/
+          MONGO_DB=birds_db
+          MINIO_ENDPOINT=localhost:9000
+          MINIO_ACCESS_KEY=minioadmin
+          MINIO_SECRET_KEY=minioadmin123
+          MINIO_BUCKET_AUDIO=bird-audio
+          MINIO_BUCKET_LOGS=bird-logs
+          MINIO_USE_SSL=false
+          KAFKA_BROKER=localhost:9092
+          KAFKA_TOPIC=bird-observations
+          AVES_BASE_URL=https://aves.regoch.net
+          AUDIO_DIR=./audio_samples
+          AUDIO_LOCATION_LAT=45.8150
+          AUDIO_LOCATION_LON=15.9819
+          EOF
+
+      
+      - name: Pokreni Bird Pipeline
+        run: |
+          mkdir -p output/logs
+          if [ "${{ github.event.inputs.run_step }}" = "all" ]; then
+            if [ -n "${{ github.event.inputs.species_filter }}" ]; then
+              snakemake --cores 1 --config species_filter="${{ github.event.inputs.species_filter }}"
+            else
+              snakemake --cores 1
+            fi
+          else
+            snakemake ${{ github.event.inputs.run_step }} --cores 1
+          fi
+
+     
+      - name: Upload izvještaja
+        if: always()  
+        uses: actions/upload-artifact@v4
+        with:
+          name: bird-reports-${{ github.run_number }}
+          path: output/*.csv
+          retention-days: 30 
+
+     
+      - name: Upload logova
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-logs-${{ github.run_number }}
+          path: output/logs/
+          retention-days: 7

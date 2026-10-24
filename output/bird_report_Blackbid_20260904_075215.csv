@@ -1,0 +1,2 @@
+scientific_name,common_name,family,order,classified_observations,avg_confidence,max_confidence,min_confidence,total_kafka_observations,lat,lon,first_classified,last_classified,unique_observers
+Turdus merula,Blackbird,Turdidae,Passeriformes,8,0.809,0.918,0.434,16,45.815,15.9819,2026-06-19 00:25,2026-09-04 07:50,1

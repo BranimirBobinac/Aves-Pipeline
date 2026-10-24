@@ -1,0 +1,6 @@
+scientific_name,common_name,family,order,classified_observations,avg_confidence,max_confidence,min_confidence,total_kafka_observations,lat,lon,first_classified,last_classified,unique_observers
+Parus major,Great Tit,Paridae,Passeriformes,7,0.755,0.974,0.578,7,45.815,15.9819,2026-06-19 00:25,2026-09-03 09:29,1
+Apus apus,Common Swift,Apodidae,Apodiformes,4,0.668,0.973,0.497,0,45.815,15.9819,2026-06-19 00:25,2026-09-03 09:29,1
+Erithacus rubecula,European Robin,Muscicapidae,Passeriformes,4,0.842,0.915,0.763,4,45.815,15.9819,2026-06-19 00:25,2026-09-03 09:29,1
+Fringilla coelebs,Common Chaffinch,Fringillidae,Passeriformes,3,0.846,0.968,0.765,3,45.815,15.9819,2026-06-19 00:25,2026-09-03 09:29,1
+Turdus merula,Blackbird,Turdidae,Passeriformes,3,0.833,0.881,0.78,6,45.815,15.9819,2026-06-19 00:25,2026-09-03 09:29,1
