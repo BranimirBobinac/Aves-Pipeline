@@ -57,26 +57,6 @@ projekt2/
 
 ## How the pipeline works
 
-```
-             ┌────────────────────────┐
-             │ Step 1: collect_species│  GET aves.regoch.net/species → MongoDB "species"
-             └───────────┬────────────┘
-             ┌───────────┴───────────┐
-             ▼                       ▼
-┌────────────────────────┐ ┌────────────────────────┐
-│ Step 2: consume_kafka  │ │ Step 3: process_audio  │
-│ Kafka topic            │ │ audio → MinIO          │
-│ → MongoDB              │ │ → POST /api/classify   │
-│   "observations"       │ │ → JSON log → MinIO     │
-└───────────┬────────────┘ │ → MongoDB              │
-            │              │   "classifications"    │
-            │              └───────────┬────────────┘
-            └───────────┬──────────────┘
-                        ▼
-             ┌────────────────────────┐
-             │ Step 4: generate_report│  $lookup join → pandas → fuzzy filter → CSV
-             └────────────────────────┘
-```
 
 ### Step 1: Collect species taxonomy
 Fetches the species list from `https://aves.regoch.net/species` and upserts it into the `species` collection, keyed on `taxon_key`, so there are no duplicates. It also creates indexes on `taxon_key` (unique), `scientific_name` and `common_name`. If the collection already has data, the step is skipped. If the API can't be reached, it falls back to 15 built-in European species.
@@ -297,4 +277,7 @@ Every step keeps working when an external service is down, so the whole pipeline
 | Classification API | Generates a simulated BirdNET-style response |
 | Audio files | Creates placeholder WAV files |
 
-> The credentials in `.env` and `docker-compose.yml` are for local development only. Don't use them in production.
+> The credentials in `.env` and `docker-compose.yml` are for local development only.
+
+## Author
+* Branimir Bobinac
